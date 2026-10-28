@@ -435,8 +435,16 @@ async function loadMap() {
     mapSvg = $("mapBox").querySelector("svg");
     console.log("Angola after filtering:", !!mapSvg.querySelector("#ao"));
     console.log("Angola bounds:", mapSvg.querySelector("#ao")?.getBBox().toJSON());
-    const angola = mapSvg.querySelector("#ao");
-    console.log("Angola element:", angola?.outerHTML);
+    const angolaDebug = mapSvg.querySelector("#ao");
+    const angolaBounds = angolaDebug?.getBBox();
+    
+    console.log("Angola element:", angolaDebug?.outerHTML);
+    console.log("Angola dimensions:", angolaBounds ? {
+      x: angolaBounds.x,
+      y: angolaBounds.y,
+      width: angolaBounds.width,
+      height: angolaBounds.height
+    } : "Element not found");
     
     // Set a tight viewBox around the African country paths.
     const visible = [...mapSvg.querySelectorAll("path")];

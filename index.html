@@ -417,7 +417,7 @@ async function loadMap() {
      "mu","ma","mz","na","ne","ng","rw","sn","sc","sl","so","za","sd",
      "ss","sz","st","tz","tg","tn","ug","eh","zm","zw","dz","ao","cm",
      "cf","td","cd"].forEach(id=>africaIds.add(id));
-
+    console.log("Original Angola group:", svg.querySelector("#ao")?.outerHTML);
     const paths = [...svg.querySelectorAll("path")];
     console.log("Angola path found:", !!svg.querySelector("#ao"));
     console.log("Country paths:", [...svg.querySelectorAll("path")].map(p => p.id).filter(Boolean));

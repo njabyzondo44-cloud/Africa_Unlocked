@@ -418,13 +418,16 @@ async function loadMap() {
      "ss","sz","st","tz","tg","tn","ug","eh","zm","zw","dz","ao","cm",
      "cf","td","cd"].forEach(id=>africaIds.add(id));
     console.log("Original Angola group:", svg.querySelector("#ao")?.outerHTML);
-    const paths = [...svg.querySelectorAll("path")];
-    console.log("Angola path found:", !!svg.querySelector("#ao"));
-    console.log("Country paths:", [...svg.querySelectorAll("path")].map(p => p.id).filter(Boolean));
-    paths.forEach(p=>{
-      if (!africaIds.has((p.id||"").toLowerCase())) p.remove();
-    });
+   const paths = [...svg.querySelectorAll("path")];
 
+console.log("Original Angola group:", svg.querySelector("#ao")?.outerHTML);
+
+paths.forEach(p => {
+  const countryGroup = p.closest("g[id]");
+  const countryId = (p.id || countryGroup?.id || "").toLowerCase();
+
+  if (!africaIds.has(countryId)) p.remove();
+});
     svg.setAttribute("viewBox", svg.getAttribute("viewBox") || "0 0 1000 600");
     svg.setAttribute("role","img");
     svg.setAttribute("aria-label","Map of African countries");

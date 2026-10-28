@@ -419,7 +419,8 @@ async function loadMap() {
      "cf","td","cd"].forEach(id=>africaIds.add(id));
 
     const paths = [...svg.querySelectorAll("path")];
-  
+    console.log("Angola path found:", !!svg.querySelector("#ao"));
+    console.log("Country paths:", [...svg.querySelectorAll("path")].map(p => p.id).filter(Boolean));
     paths.forEach(p=>{
       if (!africaIds.has((p.id||"").toLowerCase())) p.remove();
     });

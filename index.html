@@ -390,14 +390,14 @@ function startMission() {
 
 $("mission").addEventListener("change",startMission);
 $("restart").addEventListener("click",startMission);
-$("next").addEventListener("click",()=>{
+$("next").addEventListener("click", () => {
   if (index >= questions.length) {
-    startMission();
-  } else {
     showQuestion();
+    return;
   }
-  });
-  $("hint").addEventListener("click",()=>{
+
+  showQuestion();
+});  $("hint").addEventListener("click",()=>{
   if (answered || !current) return;
   hintUsed = true;
   $("feedback").textContent = "💡 Hint: " + current.hint;

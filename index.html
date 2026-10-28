@@ -435,7 +435,7 @@ async function loadMap() {
     mapSvg = $("mapBox").querySelector("svg");
     console.log("Angola after filtering:", !!mapSvg.querySelector("#ao"));
     console.log("Angola bounds:", mapSvg.querySelector("#ao")?.getBBox());
-
+    
     // Set a tight viewBox around the African country paths.
     const visible = [...mapSvg.querySelectorAll("path")];
     if (!visible.length) throw new Error("No country shapes were found in the map.");

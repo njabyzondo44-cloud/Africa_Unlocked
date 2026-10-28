@@ -541,10 +541,16 @@ console.log("Angola dimensions:", angolaBounds ? {
   }
 });
     if (Number.isFinite(minX)) {
-      const pad=12;
-      mapSvg.setAttribute("viewBox",
-        `${minX-pad} ${minY-pad} ${maxX-minX+pad*2} ${maxY-minY+pad*2}`);
-    }
+  const pad = 2;
+  mapSvg.setAttribute(
+    "viewBox",
+    `${minX-pad} ${minY-pad} ${maxX-minX+pad*2} ${maxY-minY+pad*2}`
+  );
+  mapSvg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+  mapSvg.style.width = "100%";
+  mapSvg.style.height = "100%";
+  mapSvg.style.display = "block";
+}
     startMission();
   } catch (error) {
     $("mapBox").innerHTML =

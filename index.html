@@ -191,6 +191,7 @@ footer { text-align: center; padding: 24px; font-size: 12px; color: #53657a; }
 </footer>
 
 <script>
+
 const countries = [
   {id:"dz",name:"Algeria",capital:"Algiers",region:"North",coast:true},
   {id:"ao",name:"Angola",capital:"Luanda",region:"South",coast:true},
@@ -198,32 +199,48 @@ const countries = [
   {id:"bw",name:"Botswana",capital:"Gaborone",region:"South",coast:false},
   {id:"bf",name:"Burkina Faso",capital:"Ouagadougou",region:"West",coast:false},
   {id:"bi",name:"Burundi",capital:"Gitega",region:"East",coast:false},
+  {id:"cv",name:"Cabo Verde",capital:"Praia",region:"West",coast:true},
   {id:"cm",name:"Cameroon",capital:"Yaoundé",region:"Central",coast:true},
   {id:"cf",name:"Central African Republic",capital:"Bangui",region:"Central",coast:false},
   {id:"td",name:"Chad",capital:"N'Djamena",region:"Central",coast:false},
-  {id:"ci",name:"Côte d'Ivoire",capital:"Yamoussoukro",region:"West",coast:true},
+  {id:"km",name:"Comoros",capital:"Moroni",region:"East",coast:true},
+  {id:"cg",name:"Republic of the Congo",capital:"Brazzaville",region:"Central",coast:true},
   {id:"cd",name:"Democratic Republic of the Congo",capital:"Kinshasa",region:"Central",coast:true},
+  {id:"ci",name:"Côte d'Ivoire",capital:"Yamoussoukro",region:"West",coast:true},
   {id:"dj",name:"Djibouti",capital:"Djibouti",region:"East",coast:true},
   {id:"eg",name:"Egypt",capital:"Cairo",region:"North",coast:true},
+  {id:"gq",name:"Equatorial Guinea",capital:"Ciudad de la Paz",region:"Central",coast:true},
+  {id:"er",name:"Eritrea",capital:"Asmara",region:"East",coast:true},
+  {id:"sz",name:"Eswatini",capital:"Mbabane",region:"South",coast:false},
   {id:"et",name:"Ethiopia",capital:"Addis Ababa",region:"East",coast:false},
+  {id:"ga",name:"Gabon",capital:"Libreville",region:"Central",coast:true},
+  {id:"gm",name:"The Gambia",capital:"Banjul",region:"West",coast:true},
   {id:"gh",name:"Ghana",capital:"Accra",region:"West",coast:true},
   {id:"gn",name:"Guinea",capital:"Conakry",region:"West",coast:true},
+  {id:"gw",name:"Guinea-Bissau",capital:"Bissau",region:"West",coast:true},
   {id:"ke",name:"Kenya",capital:"Nairobi",region:"East",coast:true},
   {id:"ls",name:"Lesotho",capital:"Maseru",region:"South",coast:false},
+  {id:"lr",name:"Liberia",capital:"Monrovia",region:"West",coast:true},
+  {id:"ly",name:"Libya",capital:"Tripoli",region:"North",coast:true},
   {id:"mg",name:"Madagascar",capital:"Antananarivo",region:"East",coast:true},
   {id:"mw",name:"Malawi",capital:"Lilongwe",region:"East",coast:false},
   {id:"ml",name:"Mali",capital:"Bamako",region:"West",coast:false},
+  {id:"mr",name:"Mauritania",capital:"Nouakchott",region:"West",coast:true},
+  {id:"mu",name:"Mauritius",capital:"Port Louis",region:"East",coast:true},
   {id:"ma",name:"Morocco",capital:"Rabat",region:"North",coast:true},
   {id:"mz",name:"Mozambique",capital:"Maputo",region:"South",coast:true},
   {id:"na",name:"Namibia",capital:"Windhoek",region:"South",coast:true},
   {id:"ne",name:"Niger",capital:"Niamey",region:"West",coast:false},
   {id:"ng",name:"Nigeria",capital:"Abuja",region:"West",coast:true},
   {id:"rw",name:"Rwanda",capital:"Kigali",region:"East",coast:false},
+  {id:"st",name:"São Tomé and Príncipe",capital:"São Tomé",region:"Central",coast:true},
   {id:"sn",name:"Senegal",capital:"Dakar",region:"West",coast:true},
+  {id:"sc",name:"Seychelles",capital:"Victoria",region:"East",coast:true},
+  {id:"sl",name:"Sierra Leone",capital:"Freetown",region:"West",coast:true},
   {id:"so",name:"Somalia",capital:"Mogadishu",region:"East",coast:true},
   {id:"za",name:"South Africa",capital:"Pretoria",region:"South",coast:true},
-  {id:"sd",name:"Sudan",capital:"Khartoum",region:"North",coast:true},
   {id:"ss",name:"South Sudan",capital:"Juba",region:"East",coast:false},
+  {id:"sd",name:"Sudan",capital:"Khartoum",region:"North",coast:true},
   {id:"tz",name:"Tanzania",capital:"Dodoma",region:"East",coast:true},
   {id:"tg",name:"Togo",capital:"Lomé",region:"West",coast:true},
   {id:"tn",name:"Tunisia",capital:"Tunis",region:"North",coast:true},
@@ -231,6 +248,7 @@ const countries = [
   {id:"zm",name:"Zambia",capital:"Lusaka",region:"South",coast:false},
   {id:"zw",name:"Zimbabwe",capital:"Harare",region:"South",coast:false}
 ];
+
 
 const oceanQuestions = [
   {q:"Which ocean lies to the west of Africa?",a:"Atlantic Ocean",options:["Atlantic Ocean","Indian Ocean","Arctic Ocean"],hint:"It lies between Africa and the Americas."},
@@ -376,9 +394,16 @@ function checkAnswer(answer) {
     $("feedback").textContent = "Not quite! The correct answer is " + current.answer + ". Read the clue and try again in the next round.";
   }
   if (current.type === "map" && mapSvg) {
-    const p = mapSvg.querySelector("#" + current.target);
-    if (p) p.classList.add(correct ? "correct" : "wrong");
+  const countryElement = mapSvg.querySelector("#" + current.target);
+
+  if (countryElement) {
+    countryElement.classList.add(correct ? "correct" : "wrong");
+
+    countryElement.querySelectorAll("path").forEach(path => {
+      path.classList.add(correct ? "correct" : "wrong");
+    });
   }
+}
   $("choices").querySelectorAll("button").forEach(b=>{
     b.disabled = true;
     if (b.textContent === current.answer) b.style.background = "#c9eee5";
@@ -485,26 +510,36 @@ console.log("Angola dimensions:", angolaBounds ? {
     const visible = [...mapSvg.querySelectorAll("path")];
     if (!visible.length) throw new Error("No country shapes were found in the map.");
     let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
-    visible.forEach(p=>{
-      try {
-        const b=p.getBBox();
-        minX=Math.min(minX,b.x); minY=Math.min(minY,b.y);
-        maxX=Math.max(maxX,b.x+b.width); maxY=Math.max(maxY,b.y+b.height);
-      } catch(e) {}
-      p.setAttribute("tabindex","0");
-      p.setAttribute("role","button");
-      const c=countries.find(x=>x.id===p.id.toLowerCase());
-      p.setAttribute("aria-label",c?c.name:(p.id||"African region"));
-      if (c) p.addEventListener("click",()=> {
-        if (current && current.type==="map") checkAnswer(p.id.toLowerCase());
-      });
-      p.addEventListener("keydown",e=>{
-        if ((e.key==="Enter"||e.key===" ") && c) {
-          e.preventDefault();
-          if (current && current.type==="map") checkAnswer(p.id.toLowerCase());
-        }
-      });
+    visible.forEach(p => {
+  const countryGroup = p.closest("g[id]");
+  const countryId = (p.id || countryGroup?.id || "").toLowerCase();
+  const country = countries.find(c => c.id === countryId);
+
+  try {
+    p.setAttribute("tabindex", "0");
+    p.setAttribute("role", "button");
+    p.setAttribute(
+      "aria-label",
+      country ? country.name : (p.id || "African region")
+    );
+  } catch (e) {}
+
+  if (country) {
+    p.addEventListener("click", () => {
+      if (current && current.type === "map") {
+        checkAnswer(country.name);
+      }
     });
+
+    p.addEventListener("keydown", e => {
+      if ((e.key === "Enter" || e.key === " ") &&
+          current && current.type === "map") {
+        e.preventDefault();
+        checkAnswer(country.name);
+      }
+    });
+  }
+});
     if (Number.isFinite(minX)) {
       const pad=12;
       mapSvg.setAttribute("viewBox",

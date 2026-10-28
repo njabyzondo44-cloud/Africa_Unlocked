@@ -114,6 +114,12 @@ select { width: 100%; border: 1px solid #b9c6d5; background: white; }
 #choices button:hover { background: #dce8f3; }
 #choices button:disabled { cursor: default; opacity: .8; }
 .hidden { display: none !important; }
+.guide { margin-top: 10px; border-top: 1px solid #e1e8f0; padding-top: 10px; }
+.guide summary { cursor: pointer; color: var(--navy); font-weight: bold; }
+.guide-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
+.guide-card { background: #f4f7fb; border-left: 4px solid var(--teal); border-radius: 8px; padding: 11px; line-height: 1.45; }
+.guide-card p { margin: 6px 0 0; font-size: 13px; }
+@media (max-width: 760px) { .guide-grid { grid-template-columns: 1fr; } }
 footer { text-align: center; padding: 24px; font-size: 12px; color: #53657a; }
 .progress {
   height: 9px;
@@ -137,6 +143,7 @@ footer { text-align: center; padding: 24px; font-size: 12px; color: #53657a; }
   <h1>🌍 Africa Unlocked</h1>
   <p><strong>The Continental Explorer</strong></p>
   <p>Explore Africa. Solve the clues. Unlock your geography skills!</p>
+  <p class="small" style="color:#eaf2f8;margin-top:8px">Intermediate Phase Geography · Countries, capitals, oceans, borders, islands and the Equator</p>
 </header>
 
 <main>
@@ -149,14 +156,40 @@ footer { text-align: center; padding: 24px; font-size: 12px; color: #53657a; }
   <div class="panel" style="margin-bottom:16px">
     <label for="mission"><strong>Choose your mission</strong></label>
     <select id="mission" style="margin-top:8px">
-      <option value="countries">Mission 1: Country Explorer</option>
-      <option value="oceans">Mission 2: Ocean Guardians</option>
-      <option value="capitals">Mission 3: Capital City Quest</option>
-      <option value="islands">Mission 4: Island Specialists</option>
-      <option value="landlocked">Mission 5: Border Detectives</option>
+      <option value="world">Mission 1: World & Globe Explorer</option>
+      <option value="countries">Mission 2: Country Explorer</option>
+      <option value="oceans">Mission 3: Ocean Guardians</option>
+      <option value="capitals">Mission 4: Capital City Quest</option>
+      <option value="islands">Mission 5: Island Specialists</option>
+      <option value="equator">Mission 6: Equator Challenge</option>
+      <option value="landlocked">Mission 7: Border Detectives</option>
     </select>
     <div class="progress"><div id="bar"></div></div>
-    <p class="small" id="missionInfo">Find each country on the map. Correct answers earn points!</p>
+    <p class="small" id="missionInfo">Explore Africa, solve the clues and earn achievement badges.</p>
+    <details class="guide">
+      <summary>🌐 Quick geography guide</summary>
+      <div class="guide-grid">
+        <div class="guide-card">
+          <strong>World map and globe</strong>
+          <svg viewBox="0 0 160 120" role="img" aria-label="Schematic globe showing Africa crossed by the Equator" style="display:block;width:100%;max-width:150px;height:auto;margin:8px auto">
+            <circle cx="80" cy="60" r="47" fill="#dff3fa" stroke="#102a43" stroke-width="2" />
+            <ellipse cx="80" cy="60" rx="22" ry="47" fill="none" stroke="#6d8da6" stroke-width="1" />
+            <ellipse cx="80" cy="60" rx="39" ry="47" fill="none" stroke="#6d8da6" stroke-width="1" />
+            <path d="M35 60 H125" stroke="#e76f51" stroke-width="2" stroke-dasharray="4 3" />
+            <path d="M76 28 L86 32 L91 41 L87 48 L93 56 L87 64 L88 74 L81 87 L75 78 L69 69 L67 58 L61 49 L66 38 Z" fill="#2a9d8f" stroke="#102a43" stroke-width="1" />
+          </svg>
+          <p>Africa is a continent. It lies in all four hemispheres because the Equator crosses it and the Prime Meridian passes through western Africa. Diagram is schematic.</p>
+        </div>
+        <div class="guide-card">
+          <strong>Oceans and seas</strong>
+          <p>The Atlantic Ocean lies west of Africa and the Indian Ocean lies east. The Mediterranean Sea lies to the north and the Red Sea to the north-east.</p>
+        </div>
+        <div class="guide-card">
+          <strong>Countries, borders and islands</strong>
+          <p>A border marks the boundary between countries. A landlocked country has no coastline. Madagascar is an island country; Zanzibar is part of Tanzania.</p>
+        </div>
+      </div>
+    </details>
   </div>
 
   <div class="layout">
@@ -249,18 +282,56 @@ const countries = [
   {id:"zw",name:"Zimbabwe",capital:"Harare",region:"South",coast:false}
 ];
 
-
 const oceanQuestions = [
-  {q:"Which ocean lies to the west of Africa?",a:"Atlantic Ocean",options:["Atlantic Ocean","Indian Ocean","Arctic Ocean"],hint:"It lies between Africa and the Americas."},
+  {q:"Which ocean lies to the west of Africa?",a:"Atlantic Ocean",options:["Atlantic Ocean","Indian Ocean","Pacific Ocean"],hint:"It lies between Africa and the Americas."},
   {q:"Which ocean lies to the east and south-east of Africa?",a:"Indian Ocean",options:["Pacific Ocean","Indian Ocean","Atlantic Ocean"],hint:"Madagascar lies in this ocean."},
   {q:"Which sea lies between north-eastern Africa and the Arabian Peninsula?",a:"Red Sea",options:["Caribbean Sea","Red Sea","Baltic Sea"],hint:"It separates north-eastern Africa from Asia."},
-  {q:"Which sea lies north of Africa between Africa and Europe?",a:"Mediterranean Sea",options:["Mediterranean Sea","Black Sea","Coral Sea"],hint:"It borders countries such as Tunisia and Libya."}
+  {q:"Which sea lies north of Africa between Africa and Europe?",a:"Mediterranean Sea",options:["Mediterranean Sea","Black Sea","Coral Sea"],hint:"It borders countries such as Tunisia and Libya."},
+  {q:"Madagascar lies in which ocean?",a:"Indian Ocean",options:["Indian Ocean","Atlantic Ocean","Arctic Ocean"],hint:"Look to the east of mainland Africa."},
+  {q:"Which ocean borders the west coast of Senegal?",a:"Atlantic Ocean",options:["Atlantic Ocean","Indian Ocean","Southern Ocean"],hint:"It lies west of West Africa."},
+  {q:"Which body of water lies between north-east Africa and the Arabian Peninsula?",a:"Red Sea",options:["Red Sea","Mediterranean Sea","Lake Victoria"],hint:"The Suez Canal connects it to the Mediterranean Sea."},
+  {q:"Which sea borders northern countries such as Morocco, Algeria and Tunisia?",a:"Mediterranean Sea",options:["Mediterranean Sea","Red Sea","Arabian Sea"],hint:"It lies between Africa and Europe."},
+  {q:"Which ocean lies off the coast of Mozambique?",a:"Indian Ocean",options:["Indian Ocean","Atlantic Ocean","Pacific Ocean"],hint:"It is on Africa's eastern side."},
+  {q:"Which ocean lies off the coast of Namibia?",a:"Atlantic Ocean",options:["Atlantic Ocean","Indian Ocean","Arctic Ocean"],hint:"Namibia is on Africa's south-western coast."}
 ];
 
 const islandQuestions = [
-  {q:"Which of these is a large island country off the south-eastern coast of mainland Africa?",a:"Madagascar",options:["Madagascar","Lesotho","Mali"],hint:"It lies in the Indian Ocean."},
+  {q:"Which large island off south-eastern mainland Africa is also a country?",a:"Madagascar",options:["Madagascar","Lesotho","Mali"],hint:"It lies in the Indian Ocean."},
   {q:"Zanzibar is part of which country?",a:"Tanzania",options:["Kenya","Tanzania","Mozambique"],hint:"Its mainland capital is Dodoma."},
-  {q:"Is Zanzibar an independent country?",a:"No, it is part of Tanzania",options:["Yes, it is independent","No, it is part of Tanzania","No, it is part of Madagascar"],hint:"It is an island group within a country on mainland Africa."}
+  {q:"Is Zanzibar an independent country?",a:"No, it is part of Tanzania",options:["Yes, it is independent","No, it is part of Tanzania","No, it is part of Madagascar"],hint:"It is an island group within Tanzania."},
+  {q:"Which ocean surrounds Madagascar?",a:"Indian Ocean",options:["Indian Ocean","Atlantic Ocean","Arctic Ocean"],hint:"It lies east of Mozambique."},
+  {q:"Which mainland country lies across the Mozambique Channel from Madagascar?",a:"Mozambique",options:["Mozambique","Ghana","Senegal"],hint:"Its name is similar to the channel between the mainland and Madagascar."},
+  {q:"Which statement about Madagascar is correct?",a:"It is both an island and a country",options:["It is both an island and a country","It is a landlocked country","It is part of South Africa"],hint:"It has its own government and is surrounded by ocean."},
+  {q:"Zanzibar is located off the coast of which part of Africa?",a:"East Africa",options:["East Africa","West Africa","North Africa"],hint:"It belongs to Tanzania, on the continent's eastern side."},
+  {q:"Which of these is an island country in the Indian Ocean?",a:"Madagascar",options:["Madagascar","Chad","Botswana"],hint:"It is the large island east of Mozambique."},
+  {q:"Which feature best describes Zanzibar?",a:"An island group belonging to Tanzania",options:["An island group belonging to Tanzania","A landlocked country","A capital city of Madagascar"],hint:"It is part of Tanzania, not a separate sovereign country."},
+  {q:"When finding Madagascar on an Africa map, which direction should you look from mainland Mozambique?",a:"East",options:["East","West","North"],hint:"Madagascar is across the Mozambique Channel."}
+];
+
+const worldQuestions = [
+  {q:"On a world map, Africa is shown as a…",a:"continent",options:["continent","country","ocean"],hint:"Africa contains many countries."},
+  {q:"What is a globe?",a:"A spherical model of Earth",options:["A spherical model of Earth","A flat drawing of one country","A map of the oceans only"],hint:"It has a shape similar to Earth."},
+  {q:"Which continent lies north of Africa across the Mediterranean Sea?",a:"Europe",options:["Europe","South America","Australia"],hint:"It is separated from Africa by the Mediterranean Sea."},
+  {q:"Which sea lies between Africa and Europe?",a:"Mediterranean Sea",options:["Mediterranean Sea","Red Sea","Caribbean Sea"],hint:"It borders northern Africa."},
+  {q:"Which ocean lies west of Africa on a world map?",a:"Atlantic Ocean",options:["Atlantic Ocean","Indian Ocean","Pacific Ocean"],hint:"It is between Africa and the Americas."},
+  {q:"Which ocean lies east of Africa?",a:"Indian Ocean",options:["Indian Ocean","Atlantic Ocean","Arctic Ocean"],hint:"Madagascar lies in it."},
+  {q:"Which line of latitude crosses Africa and divides Earth into Northern and Southern Hemispheres?",a:"Equator",options:["Equator","Prime Meridian","Tropic of Capricorn"],hint:"It is at 0 degrees latitude."},
+  {q:"Which line of longitude passes through western Africa and divides Earth into Eastern and Western Hemispheres?",a:"Prime Meridian",options:["Prime Meridian","Equator","Tropic of Cancer"],hint:"It is at 0 degrees longitude."},
+  {q:"Africa extends into which hemispheres?",a:"Northern, Southern, Eastern and Western",options:["Northern, Southern, Eastern and Western","Northern Hemisphere only","Southern Hemisphere only"],hint:"Both the Equator and the Prime Meridian cross Africa."},
+  {q:"When locating Africa on a globe, which feature helps you identify its position north and south?",a:"The Equator",options:["The Equator","The International Date Line","The Arctic Circle"],hint:"It crosses the continent near its middle."}
+];
+
+const equatorQuestions = [
+  {q:"What is the Equator?",a:"An imaginary line at 0 degrees latitude",options:["An imaginary line at 0 degrees latitude","A border between two countries","A line at 0 degrees longitude"],hint:"It circles Earth halfway between the poles."},
+  {q:"Which two hemispheres are separated by the Equator?",a:"Northern and Southern",options:["Northern and Southern","Eastern and Western","Eastern and Northern"],hint:"Think of the halves above and below the Equator."},
+  {q:"Which African country is crossed by the Equator?",a:"Kenya",options:["Kenya","Algeria","South Africa"],hint:"It is in East Africa."},
+  {q:"Which of these countries lies on both sides of the Equator?",a:"Democratic Republic of the Congo",options:["Democratic Republic of the Congo","Namibia","Morocco"],hint:"The Equator crosses central Africa."},
+  {q:"Which country in west-central Africa is crossed by the Equator?",a:"Gabon",options:["Gabon","Tunisia","Botswana"],hint:"It lies on the Atlantic coast in Central Africa."},
+  {q:"Which country lies north of the Equator?",a:"Algeria",options:["Algeria","Namibia","South Africa"],hint:"It is in North Africa."},
+  {q:"Which country lies entirely south of the Equator?",a:"Namibia",options:["Namibia","Egypt","Algeria"],hint:"It is in south-western Africa."},
+  {q:"Which African country in East Africa is crossed by the Equator?",a:"Uganda",options:["Uganda","Libya","Senegal"],hint:"It is near Kenya and Lake Victoria."},
+  {q:"At which latitude is the Equator located?",a:"0 degrees",options:["0 degrees","23.5 degrees north","66.5 degrees south"],hint:"It is the starting line for measuring latitude north and south."},
+  {q:"Which ocean does the Equator cross off the west coast of Africa?",a:"Atlantic Ocean",options:["Atlantic Ocean","Arctic Ocean","Southern Ocean"],hint:"It is the ocean west of the continent."}
 ];
 
 let mapSvg = null;
@@ -272,60 +343,64 @@ const shuffle = arr => [...arr].sort(() => Math.random() - 0.5);
 
 function buildQuestions(mission) {
   if (mission === "countries") {
-    return shuffle(countries).slice(0,10).map(c => ({
-      type:"map", target:c.id, answer:c.name,
-      q:"Find this country on the map: " + c.name,
-      hint:"Look in the " + c.region + "ern part of Africa. " +
+    return shuffle(countries).slice(0, 10).map(c => ({
+      type: "map", target: c.id, answer: c.name,
+      q: "Find this country on the map: " + c.name,
+      hint: "Look in the " + c.region + " part of Africa. " +
         (c.coast ? "It has a coastline." : "It is landlocked.")
     }));
   }
+
   if (mission === "capitals") {
-    return shuffle(countries).slice(0,10).map(c => ({
-      type:"choice", answer:c.capital,
-      q:"What is the capital city of " + c.name + "?",
-      options:shuffle([c.capital, ...shuffle(countries.filter(x=>x.id!==c.id).map(x=>x.capital)).slice(0,2)]),
-      hint:"Look for the capital associated with " + c.name + "."
+    return shuffle(countries).slice(0, 10).map(c => ({
+      type: "choice", answer: c.capital,
+      q: "What is the capital city of " + c.name + "?",
+      options: shuffle([c.capital, ...shuffle(countries.filter(x => x.id !== c.id).map(x => x.capital)).slice(0, 2)]),
+      hint: "Think of the capital associated with " + c.name + "."
     }));
   }
-  if (mission === "oceans") {
-    return shuffle(oceanQuestions).concat(shuffle(oceanQuestions)).slice(0,8)
-      .map(q=>({type:"choice",...q}));
-  }
-  if (mission === "islands") {
-    return shuffle(islandQuestions).concat(shuffle(islandQuestions)).slice(0,6)
-      .map(q=>({type:"choice",...q}));
-  }
-  const landlocked = countries.filter(c=>!c.coast);
-  const coastal = countries.filter(c=>c.coast);
-  const qs = [
-    ...shuffle(landlocked).slice(0,5).map(c=>({
-      type:"choice",answer:c.name,
-      q:"Which country is landlocked (has no coastline)?",
-      options:shuffle([c.name,...shuffle(coastal).slice(0,2).map(x=>x.name)]),
-      hint:c.name+" is surrounded by other countries and has no direct sea coast."
-    })),
-    ...shuffle(coastal).slice(0,5).map(c=>({
-      type:"choice",answer:c.name,
-      q:"Which country has a coastline?",
-      options:shuffle([c.name,...shuffle(landlocked).slice(0,2).map(x=>x.name)]),
-      hint:c.name+" borders the sea or ocean."
-    }))
+
+  if (mission === "world") return shuffle(worldQuestions);
+  if (mission === "oceans") return shuffle(oceanQuestions);
+  if (mission === "islands") return shuffle(islandQuestions);
+  if (mission === "equator") return shuffle(equatorQuestions);
+
+  const landlocked = countries.filter(c => !c.coast);
+  const coastal = countries.filter(c => c.coast);
+  const fixed = [
+    {type:"choice",answer:"A boundary separating one country from another",q:"What does a national border show?",options:shuffle(["A boundary separating one country from another","The location of an ocean","The height of a mountain"]),hint:"Borders mark the limits between countries."},
+    {type:"choice",answer:"A country with no coastline",q:"What does landlocked mean?",options:shuffle(["A country with no coastline","A country made entirely of islands","A country surrounded by ocean"]),hint:"A landlocked country has no direct access to the sea."},
+    {type:"choice",answer:"The edge of land along a sea or ocean",q:"What is a coastline?",options:shuffle(["The edge of land along a sea or ocean","A border between two provinces only","A line showing the Equator"]),hint:"A coastline is where land meets the sea or ocean."},
+    {type:"choice",answer:"Lesotho",q:"Which country is entirely surrounded by South Africa?",options:shuffle(["Lesotho","Kenya","Nigeria"]),hint:"It is a small, landlocked country within South Africa's borders."},
+    {type:"choice",answer:"Lesotho",q:"Which of these countries is landlocked?",options:shuffle(["Lesotho","Ghana","Somalia"]),hint:"It has no coastline and is surrounded by South Africa."},
+    {type:"choice",answer:"Namibia",q:"Which of these countries has a coastline?",options:shuffle(["Namibia","Zambia","Uganda"]),hint:"It lies along the Atlantic Ocean."},
+    {type:"choice",answer:"A political map",q:"Which type of map commonly shows country borders?",options:shuffle(["A political map","A weather forecast","A photograph of clouds"]),hint:"It shows countries and their boundaries."}
   ];
-  return shuffle(qs);
+  const coastQs = [
+    ...shuffle(landlocked).slice(0, 2).map(c => ({type:"choice",answer:c.name,q:"Which country is landlocked (has no coastline)?",options:shuffle([c.name,...shuffle(coastal).slice(0,2).map(x=>x.name)]),hint:c.name+" has no direct coastline."})),
+    ...shuffle(coastal).slice(0, 1).map(c => ({type:"choice",answer:c.name,q:"Which country has a coastline?",options:shuffle([c.name,...shuffle(landlocked).slice(0,2).map(x=>x.name)]),hint:c.name+" borders a sea or ocean."}))
+  ];
+  return shuffle([...fixed, ...coastQs]).slice(0, 10);
 }
 
 function updateStats() {
   $("score").textContent = score;
   $("round").textContent = Math.min(index, questions.length) + "/" + questions.length;
   $("streak").textContent = streak;
-  $("bar").style.width = (questions.length ? index/questions.length*100 : 0) + "%";
+  $("bar").style.width = (questions.length ? index / questions.length * 100 : 0) + "%";
 }
 
 function clearMapMarks() {
   if (!mapSvg) return;
-  mapSvg.querySelectorAll("path").forEach(p=>p.classList.remove("correct","wrong"));
+  mapSvg.querySelectorAll("path").forEach(p => p.classList.remove("correct", "wrong"));
 }
 
+function setMapCountryCursor(cursor) {
+  if (!mapSvg) return;
+  mapSvg.querySelectorAll("path[data-country-id]").forEach(p => {
+    p.style.cursor = cursor;
+  });
+}
 
 function showQuestion() {
   answered = false;
@@ -336,29 +411,17 @@ function showQuestion() {
   $("feedback").textContent = "Choose your answer. You can request one hint.";
   clearMapMarks();
   updateStats();
-
-  // Hide Next Mission while learners are answering questions
   $("nextMission").style.display = "none";
 
-  // Show the completion screen after all questions are answered
   if (index >= questions.length) {
+    const badge = score >= 80 ? "🥇 Gold Globe Explorer" : score >= 50 ? "🥈 Silver Map Scout" : "🥉 Bronze Trailblazer";
     $("question").textContent = "🏆 Mission complete!";
-    $("feedback").textContent =
-      "You scored " + score + " points. Restart the mission or choose Next Mission to keep exploring.";
-
+    $("feedback").textContent = "You scored " + score + " points out of 100. Achievement unlocked: " + badge + ". Restart to practise again or choose Next Mission to keep exploring.";
     $("next").textContent = "Play again";
     $("next").disabled = false;
     $("hint").disabled = true;
-
-    // Show Next Mission only when the mission is complete
     $("nextMission").style.display = "inline-block";
-
-    if (mapSvg) {
-      mapSvg.querySelectorAll("path").forEach(p => {
-        p.style.cursor = "default";
-      });
-    }
-
+    setMapCountryCursor("default");
     return;
   }
 
@@ -367,9 +430,10 @@ function showQuestion() {
   $("next").textContent = "Next challenge →";
 
   if (current.type === "map") {
-    $("choices").innerHTML =
-      '<p class="small">Click the country on the map to answer.</p>';
+    $("choices").innerHTML = '<p class="small">Click the country on the map to answer. This round practises 10 countries from the full 54-country question bank.</p>';
+    setMapCountryCursor("pointer");
   } else {
+    setMapCountryCursor("default");
     current.options.forEach(option => {
       const b = document.createElement("button");
       b.textContent = option;
@@ -379,10 +443,11 @@ function showQuestion() {
   }
 }
 
-function checkAnswer(answer) {
-  if (answered) return;
+function checkAnswer(answer, clickedPath = null) {
+  if (answered || !current) return;
   answered = true;
   const correct = answer === current.answer;
+
   if (correct) {
     const points = hintUsed ? 5 : 10;
     score += points;
@@ -393,18 +458,17 @@ function checkAnswer(answer) {
     streak = 0;
     $("feedback").textContent = "Not quite! The correct answer is " + current.answer + ". Read the clue and try again in the next round.";
   }
+
   if (current.type === "map" && mapSvg) {
-  const countryElement = mapSvg.querySelector("#" + current.target);
-
-  if (countryElement) {
-    countryElement.classList.add(correct ? "correct" : "wrong");
-
-    countryElement.querySelectorAll("path").forEach(path => {
-      path.classList.add(correct ? "correct" : "wrong");
-    });
+    const targetElement = mapSvg.querySelector("#" + current.target);
+    if (targetElement) {
+      const targetPaths = targetElement.matches("path") ? [targetElement] : [...targetElement.querySelectorAll("path")];
+      targetPaths.forEach(path => path.classList.add("correct"));
+    }
+    if (!correct && clickedPath) clickedPath.classList.add("wrong");
   }
-}
-  $("choices").querySelectorAll("button").forEach(b=>{
+
+  $("choices").querySelectorAll("button").forEach(b => {
     b.disabled = true;
     if (b.textContent === current.answer) b.style.background = "#c9eee5";
   });
@@ -415,147 +479,100 @@ function checkAnswer(answer) {
 }
 
 function startMission() {
-  score = 0; streak = 0; index = 0;
+  score = 0;
+  streak = 0;
+  index = 0;
   questions = buildQuestions($("mission").value).slice(0, 10);
   const names = {
-    countries:"Find each country on the map. Correct answers earn 10 points, or 5 points after a hint.",
-    oceans:"Explore the oceans and seas around Africa.",
-    capitals:"Match African countries with their capital cities.",
-    islands:"Learn about Madagascar and Zanzibar.",
-    landlocked:"Distinguish landlocked countries from countries with coastlines."
+    world: "Locate Africa on a world map and globe; explore hemispheres, oceans and neighbouring continents.",
+    countries: "Find countries on the map. Each round draws 10 countries from the full 54-country question bank.",
+    oceans: "Identify the oceans and seas around Africa and practise their locations.",
+    capitals: "Match African countries with their capital cities.",
+    islands: "Explore Madagascar and Zanzibar and distinguish an island country from an island group within a country.",
+    equator: "Explore the Equator, hemispheres, latitude and African countries near or crossed by the Equator.",
+    landlocked: "Investigate country borders, coastlines and the difference between landlocked and coastal countries."
   };
-  $("missionInfo").textContent = names[$("mission").value];
-  if (mapSvg) mapSvg.querySelectorAll("path").forEach(p=>{
-    p.style.cursor = countries.some(c=>c.id===p.id) ? "pointer" : "default";
-  });
+  $("missionInfo").textContent = names[$("mission").value] || "Explore Africa and develop your map skills.";
+  setMapCountryCursor("pointer");
   showQuestion();
 }
 
-$("mission").addEventListener("change",startMission);
+$("mission").addEventListener("change", startMission);
+$("restart").addEventListener("click", startMission);
 $("nextMission").addEventListener("click", () => {
   const mission = $("mission");
   const options = [...mission.options];
-  const currentIndex = options.findIndex(
-    option => option.value === mission.value
-  );
-
-  if (options.length > 1) {
-    mission.selectedIndex = (currentIndex + 1) % options.length;
-  }
-
+  const currentIndex = options.findIndex(option => option.value === mission.value);
+  if (options.length > 1) mission.selectedIndex = (currentIndex + 1) % options.length;
   startMission();
 });
 $("next").addEventListener("click", () => {
   if (index >= questions.length) {
-    showQuestion();
+    startMission();
     return;
   }
-
   showQuestion();
-});  $("hint").addEventListener("click",()=>{
+});
+$("hint").addEventListener("click", () => {
   if (answered || !current) return;
   hintUsed = true;
   $("feedback").textContent = "💡 Hint: " + current.hint;
 });
 
-
 async function loadMap() {
   const url = "https://cdn.jsdelivr.net/gh/flekschas/simple-world-map@master/world-map.svg";
-
   try {
     const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error("Map could not be downloaded.");
-    }
-
+    if (!response.ok) throw new Error("Map could not be downloaded.");
     const svgText = await response.text();
-    const doc = new DOMParser().parseFromString(
-      svgText,
-      "image/svg+xml"
-    );
+    const doc = new DOMParser().parseFromString(svgText, "image/svg+xml");
     const svg = doc.documentElement;
-
-    if (svg.querySelector("parsererror")) {
-      throw new Error("Map data was not readable.");
-    }
+    if (svg.querySelector("parsererror")) throw new Error("Map data was not readable.");
 
     const africaIds = new Set(countries.map(c => c.id));
+    ["bf","bj","bw","bi","cv","km","cg","ci","dj","eg","gq","er","et","ga","gm","gh","gn","gw","ke","ls","lr","ly","mg","mw","ml","mr","mu","ma","mz","na","ne","ng","rw","sn","sc","sl","so","za","sd","ss","sz","st","tz","tg","tn","ug","eh","zm","zw","dz","ao","cm","cf","td","cd"].forEach(id => africaIds.add(id));
 
-    [
-      "bf","bj","bw","bi","cv","km","cg","ci","dj","eg","gq","er","et",
-      "ga","gm","gh","gn","gw","ke","ls","lr","ly","mg","mw","ml","mr",
-      "mu","ma","mz","na","ne","ng","rw","sn","sc","sl","so","za","sd",
-      "ss","sz","st","tz","tg","tn","ug","eh","zm","zw","dz","ao","cm",
-      "cf","td","cd"
-    ].forEach(id => africaIds.add(id));
-
-    // Keep African country shapes and remove the rest of the world.
-    const paths = [...svg.querySelectorAll("path")];
-
-    paths.forEach(p => {
-      const pathId = (p.id || "").toLowerCase();
-      const groupId = (
-        p.closest("g[id]")?.id || ""
-      ).toLowerCase();
-
-      const countryId = africaIds.has(pathId)
-        ? pathId
-        : groupId;
-
-      if (!africaIds.has(countryId)) {
-        p.remove();
+    function countryIdForPath(path) {
+      const pathId = (path.id || "").toLowerCase();
+      if (africaIds.has(pathId)) return pathId;
+      let parent = path.parentElement;
+      while (parent && parent !== svg) {
+        const parentId = (parent.id || "").toLowerCase();
+        if (africaIds.has(parentId)) return parentId;
+        parent = parent.parentElement;
       }
+      return "";
+    }
+
+    [...svg.querySelectorAll("path")].forEach(path => {
+      const id = countryIdForPath(path);
+      if (!id) path.remove();
     });
 
-    svg.setAttribute(
-      "viewBox",
-      svg.getAttribute("viewBox") || "0 0 1000 600"
-    );
+    svg.setAttribute("viewBox", svg.getAttribute("viewBox") || "0 0 1000 600");
     svg.setAttribute("role", "img");
-    svg.setAttribute("aria-label", "Map of African countries");
+    svg.setAttribute("aria-label", "Interactive map of African countries");
     svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
     svg.removeAttribute("width");
     svg.removeAttribute("height");
-
     $("mapBox").innerHTML = "";
     $("mapBox").appendChild(document.importNode(svg, true));
-
     mapSvg = $("mapBox").querySelector("svg");
 
     const visible = [...mapSvg.querySelectorAll("path")];
+    if (!visible.length) throw new Error("No country shapes were found in the map.");
 
-    if (!visible.length) {
-      throw new Error("No country shapes were found in the map.");
-    }
-
-    // Calculate the actual boundaries of the African map.
-    let minX = Infinity;
-    let minY = Infinity;
-    let maxX = -Infinity;
-    let maxY = -Infinity;
-
-    visible.forEach(p => {
-      const pathId = (p.id || "").toLowerCase();
-      const groupId = (
-        p.closest("g[id]")?.id || ""
-      ).toLowerCase();
-
-      const countryId = africaIds.has(pathId)
-        ? pathId
-        : groupId;
-
-      const country = countries.find(c => c.id === countryId);
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    visible.forEach(path => {
+      const id = countryIdForPath(path);
+      const country = countries.find(c => c.id === id);
+      if (id) path.dataset.countryId = id;
 
       try {
-        const bounds = p.getBBox();
-
-        if (
-          Number.isFinite(bounds.x) &&
-          Number.isFinite(bounds.y) &&
-          Number.isFinite(bounds.width) &&
-          Number.isFinite(bounds.height) &&
-          (bounds.width > 0 || bounds.height > 0)
-        ) {
+        const bounds = path.getBBox();
+        if (Number.isFinite(bounds.x) && Number.isFinite(bounds.y) &&
+            Number.isFinite(bounds.width) && Number.isFinite(bounds.height) &&
+            (bounds.width > 0 || bounds.height > 0)) {
           minX = Math.min(minX, bounds.x);
           minY = Math.min(minY, bounds.y);
           maxX = Math.max(maxX, bounds.x + bounds.width);
@@ -565,52 +582,28 @@ async function loadMap() {
         console.warn("Could not measure a map shape:", error);
       }
 
-      p.setAttribute("tabindex", "0");
-      p.setAttribute("role", "button");
-      p.setAttribute(
-        "aria-label",
-        country ? country.name : (countryId || "African region")
-      );
-
+      path.setAttribute("tabindex", "0");
+      path.setAttribute("role", "button");
+      path.setAttribute("aria-label", country ? country.name : (id || "African region"));
       if (country) {
-        p.style.cursor = "pointer";
-
-        p.addEventListener("click", () => {
-          if (current && current.type === "map") {
-            checkAnswer(country.name);
+        path.style.cursor = "pointer";
+        path.addEventListener("click", () => {
+          if (current && current.type === "map") checkAnswer(country.name, path);
+        });
+        path.addEventListener("keydown", event => {
+          if ((event.key === "Enter" || event.key === " ") && current && current.type === "map") {
+            event.preventDefault();
+            checkAnswer(country.name, path);
           }
         });
-
-        p.addEventListener("keydown", e => {
-          if (
-            (e.key === "Enter" || e.key === " ") &&
-            current &&
-            current.type === "map"
-          ) {
-            e.preventDefault();
-            checkAnswer(country.name);
-          }
-        });
+      } else {
+        path.style.cursor = "default";
       }
     });
 
-    // Zoom to Africa only when valid boundaries were calculated.
-    if (
-      Number.isFinite(minX) &&
-      Number.isFinite(minY) &&
-      Number.isFinite(maxX) &&
-      Number.isFinite(maxY) &&
-      maxX > minX &&
-      maxY > minY
-    ) {
+    if (Number.isFinite(minX) && Number.isFinite(minY) && Number.isFinite(maxX) && Number.isFinite(maxY) && maxX > minX && maxY > minY) {
       const pad = 2;
-
-      mapSvg.setAttribute(
-        "viewBox",
-        `${minX - pad} ${minY - pad} ${
-          maxX - minX + pad * 2
-        } ${maxY - minY + pad * 2}`
-      );
+      mapSvg.setAttribute("viewBox", `${minX - pad} ${minY - pad} ${maxX - minX + pad * 2} ${maxY - minY + pad * 2}`);
     } else {
       throw new Error("The African map boundaries could not be calculated.");
     }
@@ -618,17 +611,9 @@ async function loadMap() {
     mapSvg.style.width = "100%";
     mapSvg.style.height = "100%";
     mapSvg.style.display = "block";
-
     startMission();
-
   } catch (error) {
-    $("mapBox").innerHTML =
-      '<div style="padding:18px;line-height:1.6">' +
-      '<strong>Map could not load.</strong><br>' +
-      'Please check your internet connection and refresh the page. ' +
-      'The map is loaded from an external SVG, so internet access is required.' +
-      '</div>';
-
+    $("mapBox").innerHTML = '<div style="padding:18px;line-height:1.6"><strong>Map could not load.</strong><br>Please check your internet connection and refresh the page. The map is loaded from an external SVG, so internet access is required.</div>';
     console.error("Map loading error:", error);
     startMission();
   }

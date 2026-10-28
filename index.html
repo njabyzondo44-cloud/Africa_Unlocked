@@ -507,24 +507,27 @@ console.log("Angola dimensions:", angolaBounds ? {
 } : "Element not found");
     
     // Set a tight viewBox around the African country paths.
-    const visible = [...mapSvg.querySelectorAll("path")];
-    if (!visible.length) throw new Error("No country shapes were found in the map.");
-    let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
-    visible.forEach(p => {
+    
+visible.forEach(p => {
+  // Measure every retained map shape to calculate Africa's boundaries.
+  const bounds = p.getBBox();
+
+  minX = Math.min(minX, bounds.x);
+  minY = Math.min(minY, bounds.y);
+  maxX = Math.max(maxX, bounds.x + bounds.width);
+  maxY = Math.max(maxY, bounds.y + bounds.height);
+
+  // Identify the country associated with this map shape.
   const countryGroup = p.closest("g[id]");
   const countryId = (p.id || countryGroup?.id || "").toLowerCase();
   const country = countries.find(c => c.id === countryId);
 
-  try {
+  if (country) {
+    p.style.cursor = "pointer";
     p.setAttribute("tabindex", "0");
     p.setAttribute("role", "button");
-    p.setAttribute(
-      "aria-label",
-      country ? country.name : (p.id || "African region")
-    );
-  } catch (e) {}
+    p.setAttribute("aria-label", country.name);
 
-  if (country) {
     p.addEventListener("click", () => {
       if (current && current.type === "map") {
         checkAnswer(country.name);
@@ -532,14 +535,18 @@ console.log("Angola dimensions:", angolaBounds ? {
     });
 
     p.addEventListener("keydown", e => {
-      if ((e.key === "Enter" || e.key === " ") &&
-          current && current.type === "map") {
+      if (
+        (e.key === "Enter" || e.key === " ") &&
+        current &&
+        current.type === "map"
+      ) {
         e.preventDefault();
         checkAnswer(country.name);
       }
     });
   }
 });
+
     if (Number.isFinite(minX)) {
   const pad = 2;
   mapSvg.setAttribute(

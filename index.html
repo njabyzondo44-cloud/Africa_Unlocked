@@ -458,112 +458,178 @@ $("next").addEventListener("click", () => {
   $("feedback").textContent = "💡 Hint: " + current.hint;
 });
 
+
 async function loadMap() {
   const url = "https://cdn.jsdelivr.net/gh/flekschas/simple-world-map@master/world-map.svg";
+
   try {
     const response = await fetch(url);
-    if (!response.ok) throw new Error("Map could not be downloaded.");
+    if (!response.ok) {
+      throw new Error("Map could not be downloaded.");
+    }
+
     const svgText = await response.text();
-    const doc = new DOMParser().parseFromString(svgText,"image/svg+xml");
+    const doc = new DOMParser().parseFromString(
+      svgText,
+      "image/svg+xml"
+    );
     const svg = doc.documentElement;
-    if (svg.querySelector("parsererror")) throw new Error("Map data was not readable.");
 
-    const africaIds = new Set(countries.map(c=>c.id));
-    // Also retain the remaining African countries, even when not in this prototype's quiz.
-    ["bf","bj","bw","bi","cv","km","cg","ci","dj","eg","gq","er","et",
-     "ga","gm","gh","gn","gw","ke","ls","lr","ly","mg","mw","ml","mr",
-     "mu","ma","mz","na","ne","ng","rw","sn","sc","sl","so","za","sd",
-     "ss","sz","st","tz","tg","tn","ug","eh","zm","zw","dz","ao","cm",
-     "cf","td","cd"].forEach(id=>africaIds.add(id));
-    console.log("Original Angola group:", svg.querySelector("#ao")?.outerHTML);
-   const paths = [...svg.querySelectorAll("path")];
+    if (svg.querySelector("parsererror")) {
+      throw new Error("Map data was not readable.");
+    }
 
-console.log("Original Angola group:", svg.querySelector("#ao")?.outerHTML);
+    const africaIds = new Set(countries.map(c => c.id));
 
-paths.forEach(p => {
-  const countryGroup = p.closest("g[id]");
-  const countryId = (p.id || countryGroup?.id || "").toLowerCase();
+    [
+      "bf","bj","bw","bi","cv","km","cg","ci","dj","eg","gq","er","et",
+      "ga","gm","gh","gn","gw","ke","ls","lr","ly","mg","mw","ml","mr",
+      "mu","ma","mz","na","ne","ng","rw","sn","sc","sl","so","za","sd",
+      "ss","sz","st","tz","tg","tn","ug","eh","zm","zw","dz","ao","cm",
+      "cf","td","cd"
+    ].forEach(id => africaIds.add(id));
 
-  if (!africaIds.has(countryId)) p.remove();
-});
-    svg.setAttribute("viewBox", svg.getAttribute("viewBox") || "0 0 1000 600");
-    svg.setAttribute("role","img");
-    svg.setAttribute("aria-label","Map of African countries");
+    // Keep African country shapes and remove the rest of the world.
+    const paths = [...svg.querySelectorAll("path")];
+
+    paths.forEach(p => {
+      const pathId = (p.id || "").toLowerCase();
+      const groupId = (
+        p.closest("g[id]")?.id || ""
+      ).toLowerCase();
+
+      const countryId = africaIds.has(pathId)
+        ? pathId
+        : groupId;
+
+      if (!africaIds.has(countryId)) {
+        p.remove();
+      }
+    });
+
+    svg.setAttribute(
+      "viewBox",
+      svg.getAttribute("viewBox") || "0 0 1000 600"
+    );
+    svg.setAttribute("role", "img");
+    svg.setAttribute("aria-label", "Map of African countries");
+    svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
     svg.removeAttribute("width");
     svg.removeAttribute("height");
+
     $("mapBox").innerHTML = "";
-    $("mapBox").appendChild(document.importNode(svg,true));
+    $("mapBox").appendChild(document.importNode(svg, true));
+
     mapSvg = $("mapBox").querySelector("svg");
-    console.log("Angola after filtering:", !!mapSvg.querySelector("#ao"));
-    const angolaDebug = mapSvg.querySelector("#ao");
-const angolaBounds = angolaDebug?.getBBox();
 
-console.log("Angola element:", angolaDebug?.outerHTML);
-console.log("Angola dimensions:", angolaBounds ? {
-  x: angolaBounds.x,
-  y: angolaBounds.y,
-  width: angolaBounds.width,
-  height: angolaBounds.height
-} : "Element not found");
-    
-    // Set a tight viewBox around the African country paths.
-    
-visible.forEach(p => {
-  // Measure every retained map shape to calculate Africa's boundaries.
-  const bounds = p.getBBox();
+    const visible = [...mapSvg.querySelectorAll("path")];
 
-  minX = Math.min(minX, bounds.x);
-  minY = Math.min(minY, bounds.y);
-  maxX = Math.max(maxX, bounds.x + bounds.width);
-  maxY = Math.max(maxY, bounds.y + bounds.height);
+    if (!visible.length) {
+      throw new Error("No country shapes were found in the map.");
+    }
 
-  // Identify the country associated with this map shape.
-  const countryGroup = p.closest("g[id]");
-  const countryId = (p.id || countryGroup?.id || "").toLowerCase();
-  const country = countries.find(c => c.id === countryId);
+    // Calculate the actual boundaries of the African map.
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
 
-  if (country) {
-    p.style.cursor = "pointer";
-    p.setAttribute("tabindex", "0");
-    p.setAttribute("role", "button");
-    p.setAttribute("aria-label", country.name);
+    visible.forEach(p => {
+      const pathId = (p.id || "").toLowerCase();
+      const groupId = (
+        p.closest("g[id]")?.id || ""
+      ).toLowerCase();
 
-    p.addEventListener("click", () => {
-      if (current && current.type === "map") {
-        checkAnswer(country.name);
+      const countryId = africaIds.has(pathId)
+        ? pathId
+        : groupId;
+
+      const country = countries.find(c => c.id === countryId);
+
+      try {
+        const bounds = p.getBBox();
+
+        if (
+          Number.isFinite(bounds.x) &&
+          Number.isFinite(bounds.y) &&
+          Number.isFinite(bounds.width) &&
+          Number.isFinite(bounds.height) &&
+          (bounds.width > 0 || bounds.height > 0)
+        ) {
+          minX = Math.min(minX, bounds.x);
+          minY = Math.min(minY, bounds.y);
+          maxX = Math.max(maxX, bounds.x + bounds.width);
+          maxY = Math.max(maxY, bounds.y + bounds.height);
+        }
+      } catch (error) {
+        console.warn("Could not measure a map shape:", error);
+      }
+
+      p.setAttribute("tabindex", "0");
+      p.setAttribute("role", "button");
+      p.setAttribute(
+        "aria-label",
+        country ? country.name : (countryId || "African region")
+      );
+
+      if (country) {
+        p.style.cursor = "pointer";
+
+        p.addEventListener("click", () => {
+          if (current && current.type === "map") {
+            checkAnswer(country.name);
+          }
+        });
+
+        p.addEventListener("keydown", e => {
+          if (
+            (e.key === "Enter" || e.key === " ") &&
+            current &&
+            current.type === "map"
+          ) {
+            e.preventDefault();
+            checkAnswer(country.name);
+          }
+        });
       }
     });
 
-    p.addEventListener("keydown", e => {
-      if (
-        (e.key === "Enter" || e.key === " ") &&
-        current &&
-        current.type === "map"
-      ) {
-        e.preventDefault();
-        checkAnswer(country.name);
-      }
-    });
-  }
-});
+    // Zoom to Africa only when valid boundaries were calculated.
+    if (
+      Number.isFinite(minX) &&
+      Number.isFinite(minY) &&
+      Number.isFinite(maxX) &&
+      Number.isFinite(maxY) &&
+      maxX > minX &&
+      maxY > minY
+    ) {
+      const pad = 2;
 
-    if (Number.isFinite(minX)) {
-  const pad = 2;
-  mapSvg.setAttribute(
-    "viewBox",
-    `${minX-pad} ${minY-pad} ${maxX-minX+pad*2} ${maxY-minY+pad*2}`
-  );
-  mapSvg.setAttribute("preserveAspectRatio", "xMidYMid meet");
-  mapSvg.style.width = "100%";
-  mapSvg.style.height = "100%";
-  mapSvg.style.display = "block";
-}
+      mapSvg.setAttribute(
+        "viewBox",
+        `${minX - pad} ${minY - pad} ${
+          maxX - minX + pad * 2
+        } ${maxY - minY + pad * 2}`
+      );
+    } else {
+      throw new Error("The African map boundaries could not be calculated.");
+    }
+
+    mapSvg.style.width = "100%";
+    mapSvg.style.height = "100%";
+    mapSvg.style.display = "block";
+
     startMission();
+
   } catch (error) {
     $("mapBox").innerHTML =
-      '<div style="padding:18px;line-height:1.6"><strong>Map could not load.</strong><br>' +
-      'Please check your internet connection and refresh the page. The map is loaded from an external open-source SVG, so the game needs internet access to display it.</div>';
-    console.error(error);
+      '<div style="padding:18px;line-height:1.6">' +
+      '<strong>Map could not load.</strong><br>' +
+      'Please check your internet connection and refresh the page. ' +
+      'The map is loaded from an external SVG, so internet access is required.' +
+      '</div>';
+
+    console.error("Map loading error:", error);
     startMission();
   }
 }

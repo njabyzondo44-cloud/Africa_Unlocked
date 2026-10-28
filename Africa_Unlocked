@@ -180,7 +180,7 @@ footer { text-align: center; padding: 24px; font-size: 12px; color: #53657a; }
       </div>
       <div class="controls">
         <button id="restart" class="secondary">↻ Restart mission</button>
-        <button id="nextMission">Next Mission →</button>
+        <button id="nextMission" style="display:none;">Next Mission →</button>
       </div>
     </section>
   </div>
@@ -308,6 +308,7 @@ function clearMapMarks() {
   mapSvg.querySelectorAll("path").forEach(p=>p.classList.remove("correct","wrong"));
 }
 
+
 function showQuestion() {
   answered = false;
   hintUsed = false;
@@ -318,13 +319,28 @@ function showQuestion() {
   clearMapMarks();
   updateStats();
 
+  // Hide Next Mission while learners are answering questions
+  $("nextMission").style.display = "none";
+
+  // Show the completion screen after all questions are answered
   if (index >= questions.length) {
     $("question").textContent = "🏆 Mission complete!";
-    $("feedback").textContent = "You scored " + score + " points. Restart the mission or choose another mission to keep exploring.";
+    $("feedback").textContent =
+      "You scored " + score + " points. Restart the mission or choose Next Mission to keep exploring.";
+
     $("next").textContent = "Play again";
     $("next").disabled = false;
     $("hint").disabled = true;
-    if (mapSvg) mapSvg.querySelectorAll("path").forEach(p=>p.style.cursor="default");
+
+    // Show Next Mission only when the mission is complete
+    $("nextMission").style.display = "inline-block";
+
+    if (mapSvg) {
+      mapSvg.querySelectorAll("path").forEach(p => {
+        p.style.cursor = "default";
+      });
+    }
+
     return;
   }
 
@@ -333,12 +349,13 @@ function showQuestion() {
   $("next").textContent = "Next challenge →";
 
   if (current.type === "map") {
-    $("choices").innerHTML = '<p class="small">Click the country on the map to answer.</p>';
+    $("choices").innerHTML =
+      '<p class="small">Click the country on the map to answer.</p>';
   } else {
-    current.options.forEach(option=>{
+    current.options.forEach(option => {
       const b = document.createElement("button");
       b.textContent = option;
-      b.addEventListener("click",()=>checkAnswer(option));
+      b.addEventListener("click", () => checkAnswer(option));
       $("choices").appendChild(b);
     });
   }
@@ -390,11 +407,12 @@ function startMission() {
 }
 
 $("mission").addEventListener("change",startMission);
-$("restart").addEventListener("click",startMission);
-  $("nextMission").addEventListener("click", () => {
+$("nextMission").addEventListener("click", () => {
   const mission = $("mission");
   const options = [...mission.options];
-  const currentIndex = options.findIndex(option => option.value === mission.value);
+  const currentIndex = options.findIndex(
+    option => option.value === mission.value
+  );
 
   if (options.length > 1) {
     mission.selectedIndex = (currentIndex + 1) % options.length;

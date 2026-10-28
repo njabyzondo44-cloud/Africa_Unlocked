@@ -433,6 +433,8 @@ async function loadMap() {
     $("mapBox").innerHTML = "";
     $("mapBox").appendChild(document.importNode(svg,true));
     mapSvg = $("mapBox").querySelector("svg");
+    console.log("Angola after filtering:", !!mapSvg.querySelector("#ao"));
+    console.log("Angola bounds:", mapSvg.querySelector("#ao")?.getBBox());
 
     // Set a tight viewBox around the African country paths.
     const visible = [...mapSvg.querySelectorAll("path")];

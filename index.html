@@ -373,7 +373,7 @@ function checkAnswer(answer) {
 
 function startMission() {
   score = 0; streak = 0; index = 0;
-  questions = buildQuestions($("mission").value);
+  questions = buildQuestions($("mission").value).slice(0, 10);
   const names = {
     countries:"Find each country on the map. Correct answers earn 10 points, or 5 points after a hint.",
     oceans:"Explore the oceans and seas around Africa.",
@@ -391,10 +391,13 @@ function startMission() {
 $("mission").addEventListener("change",startMission);
 $("restart").addEventListener("click",startMission);
 $("next").addEventListener("click",()=>{
-  if (index >= questions.length) startMission();
-  else showQuestion();
-});
-$("hint").addEventListener("click",()=>{
+  if (index >= questions.length) {
+    startMission();
+  } else {
+    showQuestion();
+  }
+  });
+  $("hint").addEventListener("click",()=>{
   if (answered || !current) return;
   hintUsed = true;
   $("feedback").textContent = "💡 Hint: " + current.hint;

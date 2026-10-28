@@ -180,6 +180,7 @@ footer { text-align: center; padding: 24px; font-size: 12px; color: #53657a; }
       </div>
       <div class="controls">
         <button id="restart" class="secondary">↻ Restart mission</button>
+        <button id="nextMission">Next Mission →</button>
       </div>
     </section>
   </div>
@@ -390,6 +391,17 @@ function startMission() {
 
 $("mission").addEventListener("change",startMission);
 $("restart").addEventListener("click",startMission);
+  $("nextMission").addEventListener("click", () => {
+  const mission = $("mission");
+  const options = [...mission.options];
+  const currentIndex = options.findIndex(option => option.value === mission.value);
+
+  if (options.length > 1) {
+    mission.selectedIndex = (currentIndex + 1) % options.length;
+  }
+
+  startMission();
+});
 $("next").addEventListener("click", () => {
   if (index >= questions.length) {
     showQuestion();

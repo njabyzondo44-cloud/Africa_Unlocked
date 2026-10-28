@@ -1,1 +1,479 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Africa Unlocked | Continental Explorer</title>
+<style>
+:root {
+  --navy: #102a43;
+  --gold: #ffd166;
+  --teal: #2a9d8f;
+  --paper: #f4f7fb;
+  --ink: #172b4d;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+}
+header {
+  background: var(--navy);
+  color: white;
+  padding: 24px 18px;
+  text-align: center;
+  border-bottom: 5px solid var(--gold);
+}
+header h1 { margin: 0 0 8px; font-size: clamp(25px, 4vw, 38px); }
+header p { margin: 0; line-height: 1.5; }
+main { max-width: 1150px; margin: auto; padding: 18px; }
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.stat, .panel {
+  background: white;
+  padding: 16px;
+  border-radius: 14px;
+  box-shadow: 0 3px 12px #102a4310;
+}
+.stat { text-align: center; }
+.stat strong { display: block; font-size: 25px; color: var(--navy); }
+.stat span { font-size: 13px; color: #53657a; }
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(270px, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+h2 { margin-top: 0; }
+#mapBox {
+  background: #dff3fa;
+  border-radius: 12px;
+  min-height: 300px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+#mapBox svg { width: 100%; height: auto; max-height: 540px; }
+#mapBox path {
+  fill: #e6c98a;
+  stroke: #fff;
+  stroke-width: 0.7;
+  cursor: pointer;
+  transition: fill .15s;
+}
+#mapBox path:hover { fill: #f4a261; }
+#mapBox path.correct { fill: #2a9d8f; }
+#mapBox path.wrong { fill: #e76f51; }
+#mapBox path:focus { outline: none; stroke: #102a43; stroke-width: 2; }
+.question {
+  font-size: 20px;
+  font-weight: bold;
+  line-height: 1.45;
+  margin: 12px 0;
+}
+.small { font-size: 13px; color: #53657a; line-height: 1.5; }
+button, select {
+  font: inherit;
+  border-radius: 9px;
+  padding: 11px 13px;
+}
+button {
+  border: 0;
+  background: var(--navy);
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+}
+button:hover { filter: brightness(1.15); }
+button:focus-visible, select:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 2px;
+}
+button.secondary { background: #e8eef5; color: var(--navy); }
+button.gold { background: var(--gold); color: var(--navy); }
+.controls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+select { width: 100%; border: 1px solid #b9c6d5; background: white; }
+#feedback {
+  min-height: 54px;
+  padding: 12px;
+  margin-top: 12px;
+  background: #f1f5f9;
+  border-radius: 9px;
+  line-height: 1.45;
+}
+#choices { display: grid; gap: 8px; margin-top: 12px; }
+#choices button { text-align: left; background: #edf2f7; color: var(--navy); }
+#choices button:hover { background: #dce8f3; }
+#choices button:disabled { cursor: default; opacity: .8; }
+.hidden { display: none !important; }
+footer { text-align: center; padding: 24px; font-size: 12px; color: #53657a; }
+.progress {
+  height: 9px;
+  background: #e1e8f0;
+  border-radius: 99px;
+  overflow: hidden;
+  margin: 12px 0;
+}
+#bar { height: 100%; width: 0; background: var(--teal); transition: width .2s; }
+@media (max-width: 760px) {
+  .layout { grid-template-columns: 1fr; }
+  .stats { gap: 7px; }
+  .stat { padding: 12px 5px; }
+  .stat strong { font-size: 21px; }
+  main { padding: 12px; }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>🌍 Africa Unlocked</h1>
+  <p><strong>The Continental Explorer</strong></p>
+  <p>Explore Africa. Solve the clues. Unlock your geography skills!</p>
+</header>
+
+<main>
+  <div class="stats">
+    <div class="stat"><strong id="score">0</strong><span>POINTS</span></div>
+    <div class="stat"><strong id="round">0/10</strong><span>CHALLENGES</span></div>
+    <div class="stat"><strong id="streak">0</strong><span>WIN STREAK</span></div>
+  </div>
+
+  <div class="panel" style="margin-bottom:16px">
+    <label for="mission"><strong>Choose your mission</strong></label>
+    <select id="mission" style="margin-top:8px">
+      <option value="countries">Mission 1: Country Explorer</option>
+      <option value="oceans">Mission 2: Ocean Guardians</option>
+      <option value="capitals">Mission 3: Capital City Quest</option>
+      <option value="islands">Mission 4: Island Specialists</option>
+      <option value="landlocked">Mission 5: Border Detectives</option>
+    </select>
+    <div class="progress"><div id="bar"></div></div>
+    <p class="small" id="missionInfo">Find each country on the map. Correct answers earn points!</p>
+  </div>
+
+  <div class="layout">
+    <section class="panel">
+      <h2>🗺️ Explorer Map</h2>
+      <p class="small">Select the country that answers the clue. On a small screen, zoom in if needed.</p>
+      <div id="mapBox" aria-label="Interactive map of Africa">
+        <p id="mapStatus">Loading the map… An internet connection is required.</p>
+      </div>
+      <p class="small">Map source: Simple World Map by Al MacDonald and Fritz Lekschas, CC BY-SA 3.0.</p>
+    </section>
+
+    <section class="panel">
+      <h2>🎯 Your Challenge</h2>
+      <div id="question" class="question">Preparing your first challenge…</div>
+      <div id="choices"></div>
+      <div id="feedback" role="status" aria-live="polite">Ready, explorer? Choose a mission to begin.</div>
+      <div class="controls">
+        <button id="hint" class="gold">💡 Get a hint</button>
+        <button id="next" class="secondary" disabled>Next challenge →</button>
+      </div>
+      <div class="controls">
+        <button id="restart" class="secondary">↻ Restart mission</button>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  Africa Unlocked · An educational prototype for Intermediate Phase Geography
+</footer>
+
+<script>
+const countries = [
+  {id:"dz",name:"Algeria",capital:"Algiers",region:"North",coast:true},
+  {id:"ao",name:"Angola",capital:"Luanda",region:"South",coast:true},
+  {id:"bj",name:"Benin",capital:"Porto-Novo",region:"West",coast:true},
+  {id:"bw",name:"Botswana",capital:"Gaborone",region:"South",coast:false},
+  {id:"bf",name:"Burkina Faso",capital:"Ouagadougou",region:"West",coast:false},
+  {id:"bi",name:"Burundi",capital:"Gitega",region:"East",coast:false},
+  {id:"cm",name:"Cameroon",capital:"Yaoundé",region:"Central",coast:true},
+  {id:"cf",name:"Central African Republic",capital:"Bangui",region:"Central",coast:false},
+  {id:"td",name:"Chad",capital:"N'Djamena",region:"Central",coast:false},
+  {id:"ci",name:"Côte d'Ivoire",capital:"Yamoussoukro",region:"West",coast:true},
+  {id:"cd",name:"Democratic Republic of the Congo",capital:"Kinshasa",region:"Central",coast:true},
+  {id:"dj",name:"Djibouti",capital:"Djibouti",region:"East",coast:true},
+  {id:"eg",name:"Egypt",capital:"Cairo",region:"North",coast:true},
+  {id:"et",name:"Ethiopia",capital:"Addis Ababa",region:"East",coast:false},
+  {id:"gh",name:"Ghana",capital:"Accra",region:"West",coast:true},
+  {id:"gn",name:"Guinea",capital:"Conakry",region:"West",coast:true},
+  {id:"ke",name:"Kenya",capital:"Nairobi",region:"East",coast:true},
+  {id:"ls",name:"Lesotho",capital:"Maseru",region:"South",coast:false},
+  {id:"mg",name:"Madagascar",capital:"Antananarivo",region:"East",coast:true},
+  {id:"mw",name:"Malawi",capital:"Lilongwe",region:"East",coast:false},
+  {id:"ml",name:"Mali",capital:"Bamako",region:"West",coast:false},
+  {id:"ma",name:"Morocco",capital:"Rabat",region:"North",coast:true},
+  {id:"mz",name:"Mozambique",capital:"Maputo",region:"South",coast:true},
+  {id:"na",name:"Namibia",capital:"Windhoek",region:"South",coast:true},
+  {id:"ne",name:"Niger",capital:"Niamey",region:"West",coast:false},
+  {id:"ng",name:"Nigeria",capital:"Abuja",region:"West",coast:true},
+  {id:"rw",name:"Rwanda",capital:"Kigali",region:"East",coast:false},
+  {id:"sn",name:"Senegal",capital:"Dakar",region:"West",coast:true},
+  {id:"so",name:"Somalia",capital:"Mogadishu",region:"East",coast:true},
+  {id:"za",name:"South Africa",capital:"Pretoria",region:"South",coast:true},
+  {id:"sd",name:"Sudan",capital:"Khartoum",region:"North",coast:true},
+  {id:"ss",name:"South Sudan",capital:"Juba",region:"East",coast:false},
+  {id:"tz",name:"Tanzania",capital:"Dodoma",region:"East",coast:true},
+  {id:"tg",name:"Togo",capital:"Lomé",region:"West",coast:true},
+  {id:"tn",name:"Tunisia",capital:"Tunis",region:"North",coast:true},
+  {id:"ug",name:"Uganda",capital:"Kampala",region:"East",coast:false},
+  {id:"zm",name:"Zambia",capital:"Lusaka",region:"South",coast:false},
+  {id:"zw",name:"Zimbabwe",capital:"Harare",region:"South",coast:false}
+];
+
+const oceanQuestions = [
+  {q:"Which ocean lies to the west of Africa?",a:"Atlantic Ocean",options:["Atlantic Ocean","Indian Ocean","Arctic Ocean"],hint:"It lies between Africa and the Americas."},
+  {q:"Which ocean lies to the east and south-east of Africa?",a:"Indian Ocean",options:["Pacific Ocean","Indian Ocean","Atlantic Ocean"],hint:"Madagascar lies in this ocean."},
+  {q:"Which sea lies between north-eastern Africa and the Arabian Peninsula?",a:"Red Sea",options:["Caribbean Sea","Red Sea","Baltic Sea"],hint:"It separates north-eastern Africa from Asia."},
+  {q:"Which sea lies north of Africa between Africa and Europe?",a:"Mediterranean Sea",options:["Mediterranean Sea","Black Sea","Coral Sea"],hint:"It borders countries such as Tunisia and Libya."}
+];
+
+const islandQuestions = [
+  {q:"Which of these is a large island country off the south-eastern coast of mainland Africa?",a:"Madagascar",options:["Madagascar","Lesotho","Mali"],hint:"It lies in the Indian Ocean."},
+  {q:"Zanzibar is part of which country?",a:"Tanzania",options:["Kenya","Tanzania","Mozambique"],hint:"Its mainland capital is Dodoma."},
+  {q:"Is Zanzibar an independent country?",a:"No, it is part of Tanzania",options:["Yes, it is independent","No, it is part of Tanzania","No, it is part of Madagascar"],hint:"It is an island group within a country on mainland Africa."}
+];
+
+let mapSvg = null;
+let score = 0, streak = 0, index = 0, questions = [], current = null;
+let answered = false, hintUsed = false;
+
+const $ = id => document.getElementById(id);
+const shuffle = arr => [...arr].sort(() => Math.random() - 0.5);
+
+function buildQuestions(mission) {
+  if (mission === "countries") {
+    return shuffle(countries).slice(0,10).map(c => ({
+      type:"map", target:c.id, answer:c.name,
+      q:"Find this country on the map: " + c.name,
+      hint:"Look in the " + c.region + "ern part of Africa. " +
+        (c.coast ? "It has a coastline." : "It is landlocked.")
+    }));
+  }
+  if (mission === "capitals") {
+    return shuffle(countries).slice(0,10).map(c => ({
+      type:"choice", answer:c.capital,
+      q:"What is the capital city of " + c.name + "?",
+      options:shuffle([c.capital, ...shuffle(countries.filter(x=>x.id!==c.id).map(x=>x.capital)).slice(0,2)]),
+      hint:"Look for the capital associated with " + c.name + "."
+    }));
+  }
+  if (mission === "oceans") {
+    return shuffle(oceanQuestions).concat(shuffle(oceanQuestions)).slice(0,8)
+      .map(q=>({type:"choice",...q}));
+  }
+  if (mission === "islands") {
+    return shuffle(islandQuestions).concat(shuffle(islandQuestions)).slice(0,6)
+      .map(q=>({type:"choice",...q}));
+  }
+  const landlocked = countries.filter(c=>!c.coast);
+  const coastal = countries.filter(c=>c.coast);
+  const qs = [
+    ...shuffle(landlocked).slice(0,5).map(c=>({
+      type:"choice",answer:c.name,
+      q:"Which country is landlocked (has no coastline)?",
+      options:shuffle([c.name,...shuffle(coastal).slice(0,2).map(x=>x.name)]),
+      hint:c.name+" is surrounded by other countries and has no direct sea coast."
+    })),
+    ...shuffle(coastal).slice(0,5).map(c=>({
+      type:"choice",answer:c.name,
+      q:"Which country has a coastline?",
+      options:shuffle([c.name,...shuffle(landlocked).slice(0,2).map(x=>x.name)]),
+      hint:c.name+" borders the sea or ocean."
+    }))
+  ];
+  return shuffle(qs);
+}
+
+function updateStats() {
+  $("score").textContent = score;
+  $("round").textContent = Math.min(index, questions.length) + "/" + questions.length;
+  $("streak").textContent = streak;
+  $("bar").style.width = (questions.length ? index/questions.length*100 : 0) + "%";
+}
+
+function clearMapMarks() {
+  if (!mapSvg) return;
+  mapSvg.querySelectorAll("path").forEach(p=>p.classList.remove("correct","wrong"));
+}
+
+function showQuestion() {
+  answered = false;
+  hintUsed = false;
+  $("next").disabled = true;
+  $("hint").disabled = false;
+  $("choices").innerHTML = "";
+  $("feedback").textContent = "Choose your answer. You can request one hint.";
+  clearMapMarks();
+  updateStats();
+
+  if (index >= questions.length) {
+    $("question").textContent = "🏆 Mission complete!";
+    $("feedback").textContent = "You scored " + score + " points. Restart the mission or choose another mission to keep exploring.";
+    $("next").textContent = "Play again";
+    $("next").disabled = false;
+    $("hint").disabled = true;
+    if (mapSvg) mapSvg.querySelectorAll("path").forEach(p=>p.style.cursor="default");
+    return;
+  }
+
+  current = questions[index];
+  $("question").textContent = current.q;
+  $("next").textContent = "Next challenge →";
+
+  if (current.type === "map") {
+    $("choices").innerHTML = '<p class="small">Click the country on the map to answer.</p>';
+  } else {
+    current.options.forEach(option=>{
+      const b = document.createElement("button");
+      b.textContent = option;
+      b.addEventListener("click",()=>checkAnswer(option));
+      $("choices").appendChild(b);
+    });
+  }
+}
+
+function checkAnswer(answer) {
+  if (answered) return;
+  answered = true;
+  const correct = answer === current.answer;
+  if (correct) {
+    const points = hintUsed ? 5 : 10;
+    score += points;
+    streak += 1;
+    $("feedback").textContent = "✅ Correct! +" + points + " points. " +
+      (hintUsed ? "You used a hint, so this answer earns 5 points." : "Excellent exploring!");
+  } else {
+    streak = 0;
+    $("feedback").textContent = "Not quite! The correct answer is " + current.answer + ". Read the clue and try again in the next round.";
+  }
+  if (current.type === "map" && mapSvg) {
+    const p = mapSvg.querySelector("#" + current.target);
+    if (p) p.classList.add(correct ? "correct" : "wrong");
+  }
+  $("choices").querySelectorAll("button").forEach(b=>{
+    b.disabled = true;
+    if (b.textContent === current.answer) b.style.background = "#c9eee5";
+  });
+  $("hint").disabled = true;
+  $("next").disabled = false;
+  index += 1;
+  updateStats();
+}
+
+function startMission() {
+  score = 0; streak = 0; index = 0;
+  questions = buildQuestions($("mission").value);
+  const names = {
+    countries:"Find each country on the map. Correct answers earn 10 points, or 5 points after a hint.",
+    oceans:"Explore the oceans and seas around Africa.",
+    capitals:"Match African countries with their capital cities.",
+    islands:"Learn about Madagascar and Zanzibar.",
+    landlocked:"Distinguish landlocked countries from countries with coastlines."
+  };
+  $("missionInfo").textContent = names[$("mission").value];
+  if (mapSvg) mapSvg.querySelectorAll("path").forEach(p=>{
+    p.style.cursor = countries.some(c=>c.id===p.id) ? "pointer" : "default";
+  });
+  showQuestion();
+}
+
+$("mission").addEventListener("change",startMission);
+$("restart").addEventListener("click",startMission);
+$("next").addEventListener("click",()=>{
+  if (index >= questions.length) startMission();
+  else showQuestion();
+});
+$("hint").addEventListener("click",()=>{
+  if (answered || !current) return;
+  hintUsed = true;
+  $("feedback").textContent = "💡 Hint: " + current.hint;
+});
+
+async function loadMap() {
+  const url = "https://cdn.jsdelivr.net/gh/flekschas/simple-world-map@master/world-map.svg";
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("Map could not be downloaded.");
+    const svgText = await response.text();
+    const doc = new DOMParser().parseFromString(svgText,"image/svg+xml");
+    const svg = doc.documentElement;
+    if (svg.querySelector("parsererror")) throw new Error("Map data was not readable.");
+
+    const africaIds = new Set(countries.map(c=>c.id));
+    // Also retain the remaining African countries, even when not in this prototype's quiz.
+    ["bf","bj","bw","bi","cv","km","cg","ci","dj","eg","gq","er","et",
+     "ga","gm","gh","gn","gw","ke","ls","lr","ly","mg","mw","ml","mr",
+     "mu","ma","mz","na","ne","ng","rw","sn","sc","sl","so","za","sd",
+     "ss","sz","st","tz","tg","tn","ug","eh","zm","zw","dz","ao","cm",
+     "cf","td","cd"].forEach(id=>africaIds.add(id));
+
+    const paths = [...svg.querySelectorAll("path")];
+    paths.forEach(p=>{
+      if (!africaIds.has((p.id||"").toLowerCase())) p.remove();
+    });
+
+    svg.setAttribute("viewBox", svg.getAttribute("viewBox") || "0 0 1000 600");
+    svg.setAttribute("role","img");
+    svg.setAttribute("aria-label","Map of African countries");
+    svg.removeAttribute("width");
+    svg.removeAttribute("height");
+    $("mapBox").innerHTML = "";
+    $("mapBox").appendChild(document.importNode(svg,true));
+    mapSvg = $("mapBox").querySelector("svg");
+
+    // Set a tight viewBox around the African country paths.
+    const visible = [...mapSvg.querySelectorAll("path")];
+    if (!visible.length) throw new Error("No country shapes were found in the map.");
+    let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
+    visible.forEach(p=>{
+      try {
+        const b=p.getBBox();
+        minX=Math.min(minX,b.x); minY=Math.min(minY,b.y);
+        maxX=Math.max(maxX,b.x+b.width); maxY=Math.max(maxY,b.y+b.height);
+      } catch(e) {}
+      p.setAttribute("tabindex","0");
+      p.setAttribute("role","button");
+      const c=countries.find(x=>x.id===p.id.toLowerCase());
+      p.setAttribute("aria-label",c?c.name:(p.id||"African region"));
+      if (c) p.addEventListener("click",()=> {
+        if (current && current.type==="map") checkAnswer(p.id.toLowerCase());
+      });
+      p.addEventListener("keydown",e=>{
+        if ((e.key==="Enter"||e.key===" ") && c) {
+          e.preventDefault();
+          if (current && current.type==="map") checkAnswer(p.id.toLowerCase());
+        }
+      });
+    });
+    if (Number.isFinite(minX)) {
+      const pad=12;
+      mapSvg.setAttribute("viewBox",
+        `${minX-pad} ${minY-pad} ${maxX-minX+pad*2} ${maxY-minY+pad*2}`);
+    }
+    startMission();
+  } catch (error) {
+    $("mapBox").innerHTML =
+      '<div style="padding:18px;line-height:1.6"><strong>Map could not load.</strong><br>' +
+      'Please check your internet connection and refresh the page. The map is loaded from an external open-source SVG, so the game needs internet access to display it.</div>';
+    console.error(error);
+    startMission();
+  }
+}
+
+loadMap();
+</script>
+</body>
+</html>
+
